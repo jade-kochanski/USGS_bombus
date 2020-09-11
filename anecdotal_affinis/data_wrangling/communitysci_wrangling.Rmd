@@ -1,0 +1,330 @@
+---
+title: "Wrangling Community Science Data"
+output: html_notebook
+project: "USGS affinis habitat and floral use"
+author: 'Jade Kochanski'
+lead_investigators: 'Ian Pearse and John Mola'
+---
+This workbook contains the protocol and code to summarize observations and floral resource use of Bombus affinis (the Rusty-Patched Bumble Bee) using observations from the community science or open access datasets Bee Spotter, Bumble Bee Brigade, Bumble Bee Watch, and Global Biodiversity Information Facility (GBIF).
+
+Here is the original file information for each downloaded dataset:
+
+  Dataset: Wisconsin Department of Natural Resources’ Bumble Bee Brigade
+    Date accessed: 16 Jun 2020
+    Filename: “BBB.csv”
+    File type: Original download was Microsoft Excel 97-2003 Workbook named “ BBBDataQuery_6-16-2020_all-affinis”. 
+    Converted it to a .csv file and renamed to “BBB.csv”
+
+  Dataset: Bee Spotter
+    Date accessed: 2 Jul 2020
+    Filename: “BeeSpotter.csv”
+    File type: Original download was Microsoft Excel 97-2003 Workbook named “BeeSpotter - Identified Bees -Without Photo Info.” 
+    Converted it to a .csv file and renamed as “BeeSpotter.csv”
+
+  Dataset: Bumble Bee Watch
+    Date accessed: 23 Jun 2020
+    Filename: “USGS_affinis_2020.csv”
+    File type: Spreadsheet from Rich Hatfield is a .csv. 
+    There is also an associated metadata file (“USGS_affinis_2020”) in the XML Document file. 
+
+  Dataset: Global Biodiversity Information Facility (GBIF)
+    Date accessed: 3 Jul 2020
+    Filename: “gbif.csv”
+    File type: Original download was a tab delimited file named “gbif_3Jul2020_tab-delimited.” 
+    Converted to a .csv file and renamed “gbif.csv”
+
+# Load packages
+```{r}
+library(tidyverse) #used for most of the data wrangling
+```
+
+# Load and wrangle original datasets
+The goal here is to simplify and standardize each of the original data spreadsheets so they only contain information relevant to the scope of this project and information that is consistent across the databases. The general desired information for observation in each database includes location (decimal degree latitude and longitude), year, month, day, floral id and habitat, other notes.
+## GBIF
+```{r}
+#load the original file
+gbif <- read_csv("./gbif.csv")
+
+glimpse(gbif) #checkout the data
+gbif$gbifID <- as.character(gbif$gbifID)
+#filter and only keep recent observations in the midwest
+gbif_midwest <- gbif %>% filter(stateProvince == c("Wisconsin", "Minnesota", "Iowa", "Illinois")) %>%
+  filter(year >= "2000")
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#Data wrangling#
+# only keep variables of interest and identifying information
+# and remove observations that overlap with Bumble Bee Watch
+gbif_midwest <- gbif_midwest %>%
+  select(gbifID, stateProvince, day, month, year, individualCount, decimalLatitude, decimalLongitude, basisOfRecord, institutionCode, identifiedBy, dateIdentified, recordedBy, collectionCode, occurrenceID) %>%
+  filter(collectionCode != "Xerces Society - Bumble Bee Watch")
+
+# rename columns for consistency across datasets
+gbif_renamed <- gbif_midwest %>%
+  rename(obsID = gbifID,
+         state = stateProvince,
+         latitude = decimalLatitude,
+         longitude = decimalLongitude,
+         identifier = identifiedBy,
+         observer = recordedBy,
+         number = individualCount,
+         SightingURL = occurrenceID)
+
+# combine some additional information unique to this dataset. collect in a "notes" column
+gbif_renamed <- gbif_renamed %>%
+  unite("notes", basisOfRecord, institutionCode, collectionCode, sep = ";")
+
+# create a column so we know which dataset an observation came from when they are all combined.
+gbif_renamed$source <- "GBIF"
+
+# add empty columns for other information that will be collected from the photos.
+gbif_renamed$number <- 1
+gbif_renamed$floral_id <- ""
+gbif_renamed$floral_habitat <- ""
+gbif_renamed$county <- ""
+gbif_renamed$microsite <- ""
+gbif_renamed$pollen <- ""
+gbif_renamed$behavior <- ""
+gbif_renamed$sex <- ""
+  
+```
+
+## Bumble Bee Brigade
+```{r}
+# load original dataset
+BBB <- read_csv("./BBB.csv")
+glimpse(BBB)
+BBB$ObsID <- as.character(BBB$ObsID)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#Data wrangling#
+# only keep variables of interest and identifying information
+BBB <- BBB %>%
+  select(ObsID, DateObserved, Number, Sex, County, Behavior, Microsite, Pollen, Floral_ID, Floral_Habitat, Notes)
+
+# separate date column into three separate columns for consistency
+BBB <- BBB %>%
+  separate(DateObserved, sep="-", into = c("day", "month", "year"))
+
+# rename columns for consistency across datasets
+BBB_renamed <- BBB %>%
+  rename(obsID = ObsID,
+         number = Number,
+         sex = Sex,
+         county = County,
+         behavior = Behavior,
+         microsite = Microsite,
+         pollen = Pollen,
+         floral_id = Floral_ID,
+         floral_habitat = Floral_Habitat,
+         notes = Notes)
+
+# create a column so we know which dataset an observation came from when they are all combined.
+BBB_renamed$source <- "B3"
+
+# add empty columns for other information that will be collected from the photos.
+BBB_renamed$state <- "Wisconsin"
+BBB_renamed$SightingURL <- ""
+BBB_renamed$identifier <- ""
+BBB_renamed$observer <- ""
+BBB_renamed$dateIdentified <- ""
+BBB_renamed$latitude <- ""
+BBB_renamed$longitude <- ""
+```
+
+## Bumble Bee Watch
+```{r}
+# load original dataset
+bbwatch <- read_csv("./USGS_affinis_2020.csv")
+glimpse(bbwatch)
+bbwatch$BeeID <- as.character(bbwatch$BeeID)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#Data wrangling#
+# remove observations not in the midwest
+bbwatch_midwest <- bbwatch %>%
+  filter(Provinces_States != 'Maine') %>%
+  filter(Provinces_States != 'Massachusetts') %>%
+  filter(Provinces_States != 'Ohio') %>%
+  filter(Provinces_States != 'Virginia')
+
+# only keep variables of interest and identifying information
+bbwatch_midwest <- bbwatch_midwest %>%
+  select(BeeID, DateObserved, Provinces_States, Latitude, Longitude, Sex, FloralHost, Observer, Comments, DeterminedDate, DeterminedBy, DeterminerNotes, Locality, AdminNotes, SightingURL)
+
+# separate date column into three separate columns for consistency
+bbwatch_midwest <- bbwatch_midwest %>%
+  separate(DateObserved, sep="/", into = c("month", "day", "year"))
+
+# combine some additional information unique to this dataset. collect in a "notes" column
+bbwatch_midwest <- bbwatch_midwest %>%
+  unite("notes", Comments, DeterminerNotes, Locality, AdminNotes, sep = ";")
+
+# rename columns for consistency across datasets
+bbwatch_renamed <- bbwatch_midwest %>%
+  rename(obsID = BeeID,
+         state = Provinces_States,
+         latitude = Latitude,
+         longitude = Longitude,
+         sex = Sex,
+         floral_id = FloralHost,
+         observer = Observer,
+         identifier = DeterminedBy,
+         dateIdentified = DeterminedDate)
+
+# create a column so we know which dataset an observation came from when they are all combined.
+bbwatch_renamed$source <- "BB Watch"
+
+# add empty columns for other information that will be collected from the photos.
+bbwatch_renamed$number <- 1
+bbwatch_renamed$county <- ""
+bbwatch_renamed$microsite <- ""
+bbwatch_renamed$pollen <- ""
+bbwatch_renamed$floral_habitat <- ""
+bbwatch_renamed$behavior <- ""
+```
+
+## Bee Spotter
+```{r}
+# load original dataset
+beespotter <- read_csv("./BeeSpotter.csv") 
+glimpse(beespotter)
+beespotter$SpottingID <- as.character(beespotter$SpottingID)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#Data wrangling#
+# remove all species except for Bombus affinis, as identified by the expert
+beespotter_affinis <- beespotter %>%
+  filter(ExpertSpeciesIdentification_Primary == 'Bombus affinis')
+
+# only keep variables of interest and identifying information
+beespotter_affinis <- beespotter_affinis %>%
+  select(SpottingID, BeeSpotter, YearSpotted, MonthSpotted, DaySpotted, Latitude, Longitude, Gender, `Spotting URL`, Floral_ID, Pollen, Behavior, Notes) %>% 
+  filter(SpottingID != '6244') %>% #remove observations with weird GPS
+  filter(SpottingID != '4579') #remove observations with weird GPS
+
+# rename columns for consistency across datasets
+beespotter_renamed <- beespotter_affinis %>%
+  rename(obsID = SpottingID,
+         observer = BeeSpotter,
+         year = YearSpotted,
+         month = MonthSpotted,
+         day = DaySpotted,
+         latitude = Latitude,
+         longitude = Longitude,
+         sex = Gender,
+         SightingURL = `Spotting URL`,
+         floral_id = Floral_ID,
+         pollen = Pollen,
+         behavior = Behavior,
+         notes = Notes)
+
+# create a column so we know which dataset an observation came from when they are all combined.
+beespotter_renamed$source <- "BeeSpotter"
+
+# add empty columns for other information that will be collected from the photos.
+beespotter_renamed$number <- 1
+beespotter_renamed$floral_habitat <- ""
+beespotter_renamed$county <- ""
+beespotter_renamed$identifier <- ""
+beespotter_renamed$dateIdentified <- ""
+beespotter_renamed$state <- ""
+beespotter_renamed$microsite <- ""
+  
+```
+
+# spot check dfs before merging
+```{r}
+glimpse(BBB_renamed)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+glimpse(bbwatch_renamed)
+
+#change some formatting so columns can be combined across datasets
+bbwatch_renamed$latitude <- as.character(bbwatch_renamed$latitude) 
+bbwatch_renamed$longitude <- as.character(bbwatch_renamed$longitude)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+glimpse(beespotter_renamed)
+beespotter_renamed$latitude <- as.character(beespotter_renamed$latitude)
+beespotter_renamed$longitude <- as.character(beespotter_renamed$longitude)
+
+beespotter_renamed$month <- as.character(beespotter_renamed$month)
+
+beespotter_renamed$day <- as.character(beespotter_renamed$day)
+
+beespotter_renamed$year <- as.character(beespotter_renamed$year)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+glimpse(gbif_renamed)
+gbif_renamed$latitude <- as.character(gbif_renamed$latitude)
+gbif_renamed$longitude <- as.character(gbif_renamed$longitude)
+
+gbif_renamed$month <- as.character(gbif_renamed$month)
+
+gbif_renamed$day <- as.character(gbif_renamed$day)
+
+gbif_renamed$year <- as.character(gbif_renamed$year)
+```
+
+# Merge dfs
+```{r}
+# make one dataset with all B.affinis observations
+# i could only figure out how to join 2 dfs at a time.
+rpbb <- bind_rows(BBB_renamed, bbwatch_renamed)
+
+rpbb <- bind_rows(rpbb, beespotter_renamed)
+
+rpbb <- bind_rows(rpbb, gbif_renamed)
+```
+
+# Clean final df
+```{r}
+# recode some values for consistency across datasets
+rpbb <- rpbb %>%
+  mutate(month = recode(month, '10' = "Oct",
+                        '4' = "Apr",
+                        '5' = "May",
+                        '6' = "Jun",
+                        '7' = "Jul",
+                        '8' = "Aug",
+                        '9' = "Sep"))
+
+rpbb <- rpbb %>%
+  mutate(year = recode(year, '20' = "2020",
+                        '19' = "2019",
+                        '18' = "2018"))  
+
+# reorder the variables. (optional step)
+rpbb <- rpbb %>%
+  select(obsID, day, month, year, sex, floral_id, floral_habitat, pollen, behavior, microsite, state, county, latitude, longitude, number, observer, identifier, dateIdentified, SightingURL, source, notes)
+
+# create a unique observation id using a combination of the source dataset name ("source") and the observationID from the original dataset ("obsID)
+rpbb <- rpbb %>%
+  unite("obsID", source, obsID, sep = "-")
+
+# uncomment next line to export as a csv file
+#write_csv(rpbb, "./data_outputs/rpbb.csv")
+```
+
+# Queens Only
+```{r}
+# create a separate df with only queens from all datasets
+Queens <- rpbb %>%
+  filter(sex == 'Queen')
+
+queens <- rpbb %>%
+  filter(sex == 'queen')
+
+Q <- bind_rows(Queens, queens, .id = NULL)
+
+# select only information on queen floral resource use
+Q2 <- Q %>%
+  select(obsID, day, month, year, floral_id, floral_habitat, state)
+
+# uncomment next line to export as a csv file into a data outputs folder
+#write_csv(Q2, "./data_outputs/rpbb_queen_floral.csv")
+
+# uncomment next line to create a text file
+#write.table(Q2, file = "rpbb_queen_floral.txt", sep = ",", quote = FALSE, row.names = F)
+
+```
+
