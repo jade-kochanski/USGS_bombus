@@ -1,0 +1,64 @@
+obsID,day,month,year,floral_id,floral_habitat,state
+B3-3983,26,May,2020,Primula meadia,Grassland/Woodland,Wisconsin
+B3-3988,26,May,2020,Lamprocapnos spectabilis,Developed,Wisconsin
+B3-3933,21,May,2020,NA,NA,Wisconsin
+B3-3925,21,May,2020,Mertensia virginica,Woodland,Wisconsin
+B3-3932,21,May,2020,Mertensia virginica,Woodland,Wisconsin
+B3-3890,16,May,2020,Lamprocapnos spectabilis,Developed,Wisconsin
+B3-3914,9,May,2020,Dicentra cucullaria,Woodland,Wisconsin
+B3-3781,1,May,2020,Mertensia virginica,Woodland,Wisconsin
+B3-3751,26,Apr,2020,Mertensia virginica,Woodland,Wisconsin
+B3-3749,26,Apr,2020,Dicentra cucullaria,Woodland,Wisconsin
+B3-3737,24,Apr,2020,Dicentra cucullaria,Woodland,Wisconsin
+B3-3728,23,Apr,2020,Dicentra cucullaria,Woodland,Wisconsin
+B3-3714,19,Apr,2020,Scilla siberica,Developed/Woodland,Wisconsin
+B3-3711,18,Apr,2020,Scilla siberica,Developed/Woodland,Wisconsin
+B3-3701,10,Apr,2020,NA,NA,Wisconsin
+B3-3695,7,Apr,2020,NA,NA,Wisconsin
+B3-2845,13,Sep,2019,Cirsium sp.,Various,Wisconsin
+B3-2471,23,Aug,2019,Echinacea purpurea,Grassland,Wisconsin
+B3-2152,10,Aug,2019,Monarda fistuloa,Grassland,Wisconsin
+B3-3377,8,Aug,2019,Monarda fistuloa,Grassland,Wisconsin
+B3-1462,21,Jun,2019,Allium sp.,Various,Wisconsin
+B3-1327,25,Apr,2019,Dicentra cucullaria,Woodland,Wisconsin
+B3-853,14,Sep,2018,Cirsium sp.,Various,Wisconsin
+B3-831,6,Sep,2018,NA,NA,Wisconsin
+B3-782,2,Sep,2018,Liatris sp.,Grassland/Woodland,Wisconsin
+B3-776,1,Sep,2018,Liatris sp.,Grassland/Woodland,Wisconsin
+B3-770,31,Aug,2018,Liatris sp.,Grassland/Woodland,Wisconsin
+B3-754,29,Aug,2018,Cirsium discolor,Various,Wisconsin
+B3-757,29,Aug,2018,Cirsium sp.,Various,Wisconsin
+B3-319,6,Jun,2018,Weigela sp.,Developed,Wisconsin
+B3-318,6,Jun,2018,Unk,NA,Wisconsin
+B3-89,24,May,2018,Lupinus perennis,Grassland/Woodland,Wisconsin
+BB Watch-16370,20,Aug,2013,Vitex,,Wisconsin
+BB Watch-17089,10,Apr,2017,Squill,,Wisconsin
+BB Watch-22182,20,Aug,2017,Eutrochium maculatum,,Minnesota
+BB Watch-23449,4,Sep,2017,goldenrod,,Iowa
+BB Watch-22716,12,Sep,2017,Coleus,,Illinois
+BB Watch-25414,2,May,2018,Feeding on the oranges put out for the orioles,,Wisconsin
+BB Watch-25619,8,May,2018,Mustard,,Wisconsin
+BB Watch-27054,1,Jun,2018,Hydrophyllum virginianum,,Minnesota
+BB Watch-33734,27,Jul,2018,Eutrochium purpureum,,Minnesota
+BB Watch-33733,27,Jul,2018,Monarda fistulosa,,Minnesota
+BB Watch-34714,18,Aug,2018,Eutrochium purpureum,,Minnesota
+BB Watch-39060,1,Sep,2018,Agastache foeniculum,,Iowa
+BB Watch-39686,21,Apr,2019,Pulmonaria sp.,,Iowa
+BB Watch-53319,28,Aug,2019,Agastache nepetoides, yellow giant hyssop,,Iowa
+BB Watch-56264,19,Sep,2019,Japanese Anemone,,Minnesota
+BB Watch-60204,27,Apr,2020,Bluebells,,Iowa
+BB Watch-61894,31,May,2020,Virginia Waterleaf,,Minnesota
+BeeSpotter-9801,26,Apr,2020,MERVIR,,
+BeeSpotter-8353,22,Jun,2019,Blephilia sp.,,
+BeeSpotter-7713,25,Aug,2018,Prairie Thistle,,
+BeeSpotter-7725,22,Aug,2018,Canadian Wood Betony, VA Mountain Mint,,
+BeeSpotter-6359,3,Sep,2017,Prairie Thistle,,
+BeeSpotter-6355,31,Aug,2017,Prairie Thistle,,
+BeeSpotter-6219,12,Aug,2017,Prairie Thistle,,
+BeeSpotter-4843,15,Jun,2016,Sage,,
+BeeSpotter-4812,2,Jun,2016,Unk White Flower. Hyacincth?,,
+BeeSpotter-4338,17,Jul,2015,NA,,
+BeeSpotter-3901,26,Aug,2014,Prairie Thistle,,
+BeeSpotter-3877,22,Aug,2014,Joe-Pye Weed,,
+BeeSpotter-3487,8,Sep,2013,Unknown purple flower,,
+BeeSpotter-3372,28,Aug,2013,Prairie Thistle,,
