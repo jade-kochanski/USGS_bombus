@@ -1,0 +1,8 @@
+meta data 
+
+"data_raw" -- contains the datasets downloaded or recieved from Bumble Bee Brigade, Bumble Bee Watch, GBIF, and BeeSpotter. 
+            -- the original datasets were modified when Jade went through the photos for queens on these websites and added floral id, microsite info, pollen in corbicula, etc.
+
+"data_wrangling" -- as of 11 SEP 2020 only contains one R notebook with the code to clean and combine above the datasets
+
+"data_output" -- contains the resulting .csv files from combining the datasets.
