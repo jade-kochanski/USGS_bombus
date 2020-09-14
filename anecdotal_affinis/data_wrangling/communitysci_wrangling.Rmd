@@ -327,4 +327,18 @@ Q2 <- Q %>%
 #write.table(Q2, file = "rpbb_queen_floral.txt", sep = ",", quote = FALSE, row.names = F)
 
 ```
+# Unspecified females
+```{r}
+f.df <- rpbb %>%
+  filter(sex == 'female')
+
+F.df <- rpbb %>%
+  filter(sex == 'Female')
+
+females <- bind_rows(f.df, F.df, .id = NULL)
+
+# uncomment next line to export as a csv file into a data outputs folder
+#write_csv(females, "./data_outputs/unspecified_female.csv")
+```
+
 
