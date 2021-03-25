@@ -43,7 +43,7 @@ The goal here is to simplify and standardize each of the original data spreadshe
 ## GBIF
 ```{r}
 #load the original file
-gbif <- read_csv("./gbif.csv")
+gbif <- read_csv("../data_raw/gbif.csv")
 
 glimpse(gbif) #checkout the data
 gbif$gbifID <- as.character(gbif$gbifID)
@@ -92,7 +92,7 @@ gbif_renamed$sex <- ""
 ## Bumble Bee Brigade
 ```{r}
 # load original dataset
-BBB <- read_csv("./BBB.csv")
+BBB <- read_csv("../data_raw/BBB.csv")
 glimpse(BBB)
 BBB$ObsID <- as.character(BBB$ObsID)
 
@@ -135,7 +135,7 @@ BBB_renamed$longitude <- ""
 ## Bumble Bee Watch
 ```{r}
 # load original dataset
-bbwatch <- read_csv("./USGS_affinis_2020.csv")
+bbwatch <- read_csv("../data_raw/USGS_affinis_2020.csv")
 glimpse(bbwatch)
 bbwatch$BeeID <- as.character(bbwatch$BeeID)
 
@@ -187,7 +187,7 @@ bbwatch_renamed$behavior <- ""
 ## Bee Spotter
 ```{r}
 # load original dataset
-beespotter <- read_csv("./BeeSpotter.csv") 
+beespotter <- read_csv("../data_raw/BeeSpotter.csv") 
 glimpse(beespotter)
 beespotter$SpottingID <- as.character(beespotter$SpottingID)
 
@@ -302,43 +302,46 @@ rpbb <- rpbb %>%
   unite("obsID", source, obsID, sep = "-")
 
 # uncomment next line to export as a csv file
-#write_csv(rpbb, "./data_outputs/rpbb.csv")
+#write_csv(rpbb, "./data_output/rpbb.csv")
 ```
 
 # Queens Only
 ```{r}
 # create a separate df with only queens from all datasets
 Queens <- rpbb %>%
-  filter(sex == 'Queen')
+  filter(sex == 'Queen') #some are capitalized
 
 queens <- rpbb %>%
-  filter(sex == 'queen')
+  filter(sex == 'queen') #some are not capitalized
 
-Q <- bind_rows(Queens, queens, .id = NULL)
+queens_all <- bind_rows(Queens, queens, .id = NULL) #bind capital and non-capital into one df
 
 # select only information on queen floral resource use
-Q2 <- Q %>%
+queens_floral <- queens_all %>%
   select(obsID, day, month, year, floral_id, floral_habitat, state)
 
 # uncomment next line to export as a csv file into a data outputs folder
-#write_csv(Q2, "./data_outputs/rpbb_queen_floral.csv")
+#write_csv(queens_floral, "./data_output/rpbb_queen_floral.csv")
 
 # uncomment next line to create a text file
-#write.table(Q2, file = "rpbb_queen_floral.txt", sep = ",", quote = FALSE, row.names = F)
+#write.table(queens_floral, file = "rpbb_queen_floral.txt", sep = ",", quote = FALSE, row.names = F)
 
 ```
+
 # Unspecified females
 ```{r}
-f.df <- rpbb %>%
-  filter(sex == 'female')
+# make data frames with information about females that have not been specified as workers or queens
 
 F.df <- rpbb %>%
   filter(sex == 'Female')
 
+f.df <- rpbb %>%
+  filter(sex == 'female')
+
 females <- bind_rows(f.df, F.df, .id = NULL)
 
 # uncomment next line to export as a csv file into a data outputs folder
-#write_csv(females, "./data_outputs/unspecified_female.csv")
+#write_csv(females, "./data_output/unspecified_female.csv")
 ```
 
 
