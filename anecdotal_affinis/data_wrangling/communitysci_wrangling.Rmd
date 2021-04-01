@@ -43,7 +43,7 @@ The goal here is to simplify and standardize each of the original data spreadshe
 ## GBIF
 ```{r}
 #load the original file
-gbif <- read_csv("../data_raw/gbif.csv")
+gbif <- read_tsv("../data_raw/gbif_3Jul2020_tab-delimited.csv")
 
 glimpse(gbif) #checkout the data
 gbif$gbifID <- as.character(gbif$gbifID)
