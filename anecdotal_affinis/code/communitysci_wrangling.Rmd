@@ -57,10 +57,8 @@ gbif_midwest <- gbif %>% filter(stateProvince == c("Wisconsin", "Minnesota", "Io
 # and remove observations that overlap with Bumble Bee Watch
 gbif_midwest <- gbif_midwest %>%
   select(gbifID, stateProvince, day, month, year, individualCount, decimalLatitude, decimalLongitude, basisOfRecord, institutionCode, identifiedBy, dateIdentified, recordedBy, collectionCode, occurrenceID) %>%
-  filter(collectionCode != "Xerces Society - Bumble Bee Watch")
-
+  filter(collectionCode != "Xerces Society - Bumble Bee Watch") %>%
 # rename columns for consistency across datasets
-gbif_renamed <- gbif_midwest %>%
   rename(obsID = gbifID,
          state = stateProvince,
          latitude = decimalLatitude,
@@ -68,24 +66,22 @@ gbif_renamed <- gbif_midwest %>%
          identifier = identifiedBy,
          observer = recordedBy,
          number = individualCount,
-         SightingURL = occurrenceID)
-
+         SightingURL = occurrenceID) %>%
 # combine some additional information unique to this dataset. collect in a "notes" column
-gbif_renamed <- gbif_renamed %>%
   unite("notes", basisOfRecord, institutionCode, collectionCode, sep = ";")
 
 # create a column so we know which dataset an observation came from when they are all combined.
-gbif_renamed$source <- "GBIF"
+gbif_midwest$source <- "GBIF"
 
 # add empty columns for other information that will be collected from the photos.
-gbif_renamed$number <- 1
-gbif_renamed$floral_id <- ""
-gbif_renamed$floral_habitat <- ""
-gbif_renamed$county <- ""
-gbif_renamed$microsite <- ""
-gbif_renamed$pollen <- ""
-gbif_renamed$behavior <- ""
-gbif_renamed$sex <- ""
+gbif_midwest$number <- 1
+gbif_midwest$floral_id <- ""
+gbif_midwest$floral_habitat <- ""
+gbif_midwest$county <- ""
+gbif_midwest$microsite <- ""
+gbif_midwest$pollen <- ""
+gbif_midwest$behavior <- ""
+gbif_midwest$sex <- ""
   
 ```
 
@@ -100,14 +96,10 @@ BBB$ObsID <- as.character(BBB$ObsID)
 #Data wrangling#
 # only keep variables of interest and identifying information
 BBB <- BBB %>%
-  select(ObsID, DateObserved, Number, Sex, County, Behavior, Microsite, Pollen, Floral_ID, Floral_Habitat, Notes)
-
+  select(ObsID, DateObserved, Number, Sex, County, Behavior, Microsite, Pollen, Floral_ID, Floral_Habitat, Notes) %>%
 # separate date column into three separate columns for consistency
-BBB <- BBB %>%
-  separate(DateObserved, sep="-", into = c("day", "month", "year"))
-
+  separate(DateObserved, sep="-", into = c("day", "month", "year")) %>%
 # rename columns for consistency across datasets
-BBB_renamed <- BBB %>%
   rename(obsID = ObsID,
          number = Number,
          sex = Sex,
@@ -120,16 +112,16 @@ BBB_renamed <- BBB %>%
          notes = Notes)
 
 # create a column so we know which dataset an observation came from when they are all combined.
-BBB_renamed$source <- "B3"
+BBB$source <- "B3"
 
 # add empty columns for other information that will be collected from the photos.
-BBB_renamed$state <- "Wisconsin"
-BBB_renamed$SightingURL <- ""
-BBB_renamed$identifier <- ""
-BBB_renamed$observer <- ""
-BBB_renamed$dateIdentified <- ""
-BBB_renamed$latitude <- ""
-BBB_renamed$longitude <- ""
+BBB$state <- "Wisconsin"
+BBB$SightingURL <- ""
+BBB$identifier <- ""
+BBB$observer <- ""
+BBB$dateIdentified <- ""
+BBB$latitude <- ""
+BBB$longitude <- ""
 ```
 
 ## Bumble Bee Watch
@@ -150,19 +142,11 @@ bbwatch_midwest <- bbwatch %>%
 
 # only keep variables of interest and identifying information
 bbwatch_midwest <- bbwatch_midwest %>%
-  select(BeeID, DateObserved, Provinces_States, Latitude, Longitude, Sex, FloralHost, Observer, Comments, DeterminedDate, DeterminedBy, DeterminerNotes, Locality, AdminNotes, SightingURL)
-
-# separate date column into three separate columns for consistency
-bbwatch_midwest <- bbwatch_midwest %>%
-  separate(DateObserved, sep="/", into = c("month", "day", "year"))
-
-# combine some additional information unique to this dataset. collect in a "notes" column
-bbwatch_midwest <- bbwatch_midwest %>%
-  unite("notes", Comments, DeterminerNotes, Locality, AdminNotes, sep = ";")
-
-# rename columns for consistency across datasets
-bbwatch_renamed <- bbwatch_midwest %>%
-  rename(obsID = BeeID,
+  select(BeeID, DateObserved, Provinces_States, Latitude, Longitude, Sex, FloralHost, Observer, Comments, DeterminedDate, DeterminedBy, DeterminerNotes, Locality, AdminNotes, SightingURL) %>%
+  separate(DateObserved, sep="/", into = c("month", "day", "year")) %>% # separate date column into three separate columns for consistency
+  # combine some additional information unique to this dataset. collect in a "notes" column
+unite("notes", Comments, DeterminerNotes, Locality, AdminNotes, sep = ";") %>%
+  rename(obsID = BeeID, # rename columns for consistency across datasets
          state = Provinces_States,
          latitude = Latitude,
          longitude = Longitude,
@@ -171,17 +155,18 @@ bbwatch_renamed <- bbwatch_midwest %>%
          observer = Observer,
          identifier = DeterminedBy,
          dateIdentified = DeterminedDate)
-
+  
+  
 # create a column so we know which dataset an observation came from when they are all combined.
-bbwatch_renamed$source <- "BB Watch"
+bbwatch_midwest$source <- "BB Watch"
 
 # add empty columns for other information that will be collected from the photos.
-bbwatch_renamed$number <- 1
-bbwatch_renamed$county <- ""
-bbwatch_renamed$microsite <- ""
-bbwatch_renamed$pollen <- ""
-bbwatch_renamed$floral_habitat <- ""
-bbwatch_renamed$behavior <- ""
+bbwatch_midwest$number <- 1
+bbwatch_midwest$county <- ""
+bbwatch_midwest$microsite <- ""
+bbwatch_midwest$pollen <- ""
+bbwatch_midwest$floral_habitat <- ""
+bbwatch_midwest$behavior <- ""
 ```
 
 ## Bee Spotter
@@ -195,16 +180,12 @@ beespotter$SpottingID <- as.character(beespotter$SpottingID)
 #Data wrangling#
 # remove all species except for Bombus affinis, as identified by the expert
 beespotter_affinis <- beespotter %>%
-  filter(ExpertSpeciesIdentification_Primary == 'Bombus affinis')
-
+  filter(ExpertSpeciesIdentification_Primary == 'Bombus affinis') %>%
 # only keep variables of interest and identifying information
-beespotter_affinis <- beespotter_affinis %>%
   select(SpottingID, BeeSpotter, YearSpotted, MonthSpotted, DaySpotted, Latitude, Longitude, Gender, `Spotting URL`, Floral_ID, Pollen, Behavior, Notes) %>% 
   filter(SpottingID != '6244') %>% #remove observations with weird GPS
-  filter(SpottingID != '4579') #remove observations with weird GPS
-
+  filter(SpottingID != '4579') %>% #remove observations with weird GPS
 # rename columns for consistency across datasets
-beespotter_renamed <- beespotter_affinis %>%
   rename(obsID = SpottingID,
          observer = BeeSpotter,
          year = YearSpotted,
@@ -220,60 +201,62 @@ beespotter_renamed <- beespotter_affinis %>%
          notes = Notes)
 
 # create a column so we know which dataset an observation came from when they are all combined.
-beespotter_renamed$source <- "BeeSpotter"
+beespotter_affinis$source <- "BeeSpotter"
 
 # add empty columns for other information that will be collected from the photos.
-beespotter_renamed$number <- 1
-beespotter_renamed$floral_habitat <- ""
-beespotter_renamed$county <- ""
-beespotter_renamed$identifier <- ""
-beespotter_renamed$dateIdentified <- ""
-beespotter_renamed$state <- ""
-beespotter_renamed$microsite <- ""
+beespotter_affinis$number <- 1
+beespotter_affinis$floral_habitat <- ""
+beespotter_affinis$county <- ""
+beespotter_affinis$identifier <- ""
+beespotter_affinis$dateIdentified <- ""
+beespotter_affinis$state <- ""
+beespotter_affinis$microsite <- ""
   
 ```
 
 # spot check dfs before merging
 ```{r}
-glimpse(BBB_renamed)
+glimpse(BBB)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-glimpse(bbwatch_renamed)
+glimpse(bbwatch_midwest)
 
 #change some formatting so columns can be combined across datasets
-bbwatch_renamed$latitude <- as.character(bbwatch_renamed$latitude) 
-bbwatch_renamed$longitude <- as.character(bbwatch_renamed$longitude)
+bbwatch_midwest$latitude <- as.character(bbwatch_midwest$latitude) 
+bbwatch_midwest$longitude <- as.character(bbwatch_midwest$longitude)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-glimpse(beespotter_renamed)
-beespotter_renamed$latitude <- as.character(beespotter_renamed$latitude)
-beespotter_renamed$longitude <- as.character(beespotter_renamed$longitude)
+glimpse(beespotter_affinis)
+beespotter_affinis$latitude <- as.character(beespotter_affinis$latitude)
+beespotter_affinis$longitude <- as.character(beespotter_affinis$longitude)
 
-beespotter_renamed$month <- as.character(beespotter_renamed$month)
+beespotter_affinis$month <- as.character(beespotter_affinis$month)
 
-beespotter_renamed$day <- as.character(beespotter_renamed$day)
+beespotter_affinis$day <- as.character(beespotter_affinis$day)
 
-beespotter_renamed$year <- as.character(beespotter_renamed$year)
+beespotter_affinis$year <- as.character(beespotter_affinis$year)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-glimpse(gbif_renamed)
-gbif_renamed$latitude <- as.character(gbif_renamed$latitude)
-gbif_renamed$longitude <- as.character(gbif_renamed$longitude)
+glimpse(gbif_midwest)
+gbif_midwest$latitude <- as.character(gbif_midwest$latitude)
+gbif_midwest$longitude <- as.character(gbif_midwest$longitude)
 
-gbif_renamed$month <- as.character(gbif_renamed$month)
+gbif_midwest$month <- as.character(gbif_midwest$month)
 
-gbif_renamed$day <- as.character(gbif_renamed$day)
+gbif_midwest$day <- as.character(gbif_midwest$day)
 
-gbif_renamed$year <- as.character(gbif_renamed$year)
+gbif_midwest$year <- as.character(gbif_midwest$year)
+
+gbif_midwest$dateIdentified <- as.character(gbif_midwest$dateIdentified)
 ```
 
 # Merge dfs
 ```{r}
 # make one dataset with all B.affinis observations
 # i could only figure out how to join 2 dfs at a time.
-rpbb <- bind_rows(BBB_renamed, bbwatch_renamed)
+rpbb <- bind_rows(BBB, bbwatch_midwest)
 
-rpbb <- bind_rows(rpbb, beespotter_renamed)
+rpbb <- bind_rows(rpbb, beespotter_affinis)
 
-rpbb <- bind_rows(rpbb, gbif_renamed)
+rpbb <- bind_rows(rpbb, gbif_midwest)
 ```
 
 # Clean final df
@@ -286,19 +269,13 @@ rpbb <- rpbb %>%
                         '6' = "Jun",
                         '7' = "Jul",
                         '8' = "Aug",
-                        '9' = "Sep"))
-
-rpbb <- rpbb %>%
+                        '9' = "Sep")) %>%
   mutate(year = recode(year, '20' = "2020",
                         '19' = "2019",
-                        '18' = "2018"))  
-
+                        '18' = "2018")) %>%
 # reorder the variables. (optional step)
-rpbb <- rpbb %>%
-  select(obsID, day, month, year, sex, floral_id, floral_habitat, pollen, behavior, microsite, state, county, latitude, longitude, number, observer, identifier, dateIdentified, SightingURL, source, notes)
-
+  select(obsID, day, month, year, sex, floral_id, floral_habitat, pollen, behavior, microsite, state, county, latitude, longitude, number, observer, identifier, dateIdentified, SightingURL, source, notes) %>%
 # create a unique observation id using a combination of the source dataset name ("source") and the observationID from the original dataset ("obsID)
-rpbb <- rpbb %>%
   unite("obsID", source, obsID, sep = "-")
 
 # uncomment next line to export as a csv file
